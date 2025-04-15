@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N2XT - Elite Gaming Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+
+        :root {
+            /* Red Theme */
+            --primary-red: #ff1f1f; /* Bright Red */
+            --secondary-red: #a00000; /* Darker Red */
+            --accent-red: #ff4d4d; /* Lighter Red / Accent */
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --discord-purple: #5865F2;
+            --twitch-purple: #9147ff;
+        }
+
+        html {
+            scroll-behavior: smooth; /* Enable CSS smooth scrolling */
+        }
+
+        /* Initial body state for preloader */
+        body.loading {
+            opacity: 0;
+            overflow: hidden; /* Prevent scrollbars during load */
+            transition: opacity 0.5s ease-in-out;
+        }
+        body.loaded {
+            opacity: 1;
+            overflow: initial; /* Restore scrolling */
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark);
+            color: white;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        body.menu-open {
+            overflow-y: hidden; /* Prevent body scroll when mobile menu is open */
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* --- Preloader Styles --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.7s ease-out;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+        .loader-shard {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            animation: pulseShard 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+        }
+        .loader-shard-1 {
+            border-width: 0 20px 30px 20px;
+            border-color: transparent transparent var(--primary-red) transparent;
+            top: 0; left: 10px; /* Centered horizontally */
+            animation-delay: 0s;
+        }
+        .loader-shard-2 {
+            border-width: 30px 20px 0 20px;
+            border-color: var(--secondary-red) transparent transparent transparent;
+            bottom: 0; left: 10px; /* Centered horizontally */
+            animation-delay: -0.75s; /* Offset animation */
+        }
+        @keyframes pulseShard {
+            0%, 100% {
+                transform: scale(0.9) rotate(0deg);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1) rotate(5deg);
+                opacity: 1;
+            }
+        }
+        /* --- End Preloader Styles --- */
+
+
+        .logo-glow {
+            animation: logoGlow 3s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 5px var(--primary-red));
+        }
+
+        @keyframes logoGlow {
+            0% { filter: drop-shadow(0 0 5px var(--primary-red)); }
+            100% { filter: drop-shadow(0 0 15px var(--secondary-red)); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-red));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .gradient-bg { background: linear-gradient(135deg, var(--primary-red), var(--secondary-red)); }
+        .discord-btn { background: linear-gradient(90deg, var(--primary-red), var(--secondary-red)); }
+        .discord-btn:hover { filter: brightness(1.2); }
+
+        .social-icon { transition: transform 0.3s ease, color 0.3s ease; }
+        .social-icon:hover { transform: scale(1.1); color: var(--accent-red); }
+
+        .merch-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-width: 500px;
+            width: 100%;
+            background-color: var(--darker); /* Added base background */
+        }
+        .merch-item:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) scale(1.03);
+            box-shadow: 0 20px 30px rgba(255, 31, 31, 0.3);
+        }
+         /* Hoodie image adjustments */
+         .merch-item .image-container {
+             background-color: #1a1a1a; /* Dark background for image area */
+             overflow: hidden; /* Ensure image stays within bounds */
+             position: relative; /* Needed for absolute positioning of overlay */
+         }
+         .merch-item img {
+            display: block; /* Remove extra space below image */
+            width: 100%;
+            height: 450px; /* Increased height slightly */
+            object-fit: contain; /* Keep aspect ratio, fit within container */
+            /* padding: 0; */ /* Removed padding */
+         }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 31, 31, 0.2);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .form-input:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(255, 31, 31, 0.3);
+            background: rgba(255, 31, 31, 0.05);
+            outline: none; /* Remove default outline */
+        }
+        select.form-input {
+           appearance: none; -webkit-appearance: none; -moz-appearance: none;
+           background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+           background-repeat: no-repeat; background-position-x: calc(100% - 10px); background-position-y: 50%;
+           padding-right: 2.5rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, var(--primary-red), var(--secondary-red));
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 31, 31, 0.3);
+            filter: brightness(1.1);
+        }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .submit-btn:active:not(:disabled) { transform: scale(0.98) translateY(-1px); } /* Click feedback */
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 31, 31, 0.2);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(255, 31, 31, 0.15); }
+
+        .progress-bar { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-red), var(--accent-red)); transition: width 2s ease; border-radius: 3px; }
+
+        .particle { position: absolute; background: linear-gradient(90deg, var(--primary-red), var(--accent-red)); border-radius: 50%; pointer-events: none; z-index: -1; }
+        @keyframes float { 0% { transform: translateY(0) translateX(0); } 50% { transform: translateY(-15px) translateX(10px); } 100% { transform: translateY(0) translateX(0); } }
+
+        .page-transition { /* Used for initial page load fade-in, handled by JS now */ }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .flip-card { perspective: 1000px; min-height: 180px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 1.5rem; border-radius: 0.5rem; }
+        .flip-card-front { background-color: rgba(31, 31, 31, 0.7); border: 1px solid rgba(255, 31, 31, 0.1); }
+        .flip-card-back { background: linear-gradient(135deg, rgba(160, 0, 0, 0.2), rgba(255, 31, 31, 0.1)); border: 1px solid rgba(255, 31, 31, 0.2); color: white; transform: rotateY(180deg); padding: 1.5rem; }
+
+        .ticker { animation: ticker 40s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .wave-btn { position: relative; overflow: hidden; z-index: 1; transition: transform 0.2s ease, filter 0.3s ease, box-shadow 0.3s ease; }
+        .wave-btn:hover:not(:disabled) { animation: wave 0.5s linear; }
+        @keyframes wave { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        .wave-btn:active:not(:disabled) { transform: scale(0.97); } /* Click feedback */
+
+        .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transform: scale(0); animation: ripple 0.6s linear; pointer-events: none; z-index: 0; }
+        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+        #mobile-menu { position: fixed; top: 0; right: -100%; width: 75%; max-width: 300px; height: 100vh; background-color: var(--darker); z-index: 100; transition: right 0.4s ease-in-out; padding-top: 4rem; border-left: 1px solid rgba(255, 31, 31, 0.2); }
+        #mobile-menu.menu-open { right: 0; }
+
+        #menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 99; opacity: 0; transition: opacity 0.4s ease-in-out; pointer-events: none; }
+        #menu-overlay.active { opacity: 1; pointer-events: auto; }
+
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0.7); cursor: pointer; }
+        input[type="date"], select { color-scheme: dark; }
+
+        /* Merch Modal Selection Styles */
+        .size-btn.selected, .color-btn.selected { border-color: var(--primary-red); color: var(--primary-red); font-weight: bold; box-shadow: 0 0 5px rgba(255, 31, 31, 0.5); }
+        .color-btn.selected { ring: 2px; ring-offset: 2px; ring-offset-gray-900; ring-color: var(--primary-red); }
+        .add-to-cart-btn:disabled { opacity: 0.5; cursor: not-allowed; background: linear-gradient(90deg, #555, #333); }
+        .add-to-cart-btn:disabled:hover { transform: none; box-shadow: none; filter: none; }
+        .add-to-cart-btn:active:not(:disabled) { transform: scale(0.98); } /* Click feedback */
+
+        /* Utility for click feedback */
+        .clickable-feedback:active:not(:disabled) { transform: scale(0.97); }
+
+    </style>
+</head>
+<body class="loading"> <!-- Start with loading class -->
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader">
+            <div class="loader-shard loader-shard-1"></div>
+            <div class="loader-shard loader-shard-2"></div>
+        </div>
+    </div>
+
+    <!-- Particle Background -->
+    <div id="particles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
+    <!-- Mobile Menu Overlay -->
+    <div id="menu-overlay"></div>
+
+<!-- Navigation -->
+<nav class="bg-black/80 backdrop-blur-md fixed w-full z-50 border-b border-[color:rgba(255,31,31,0.2)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <a href="#home" aria-label="N2XT Home">
+                        <img src="https://media.discordapp.net/attachments/1309459159049179200/1361668011039129764/Picsart_25-04-15_12-42-22-061.png?ex=67ff97a8&is=67fe4628&hm=3829914fc459b295a857e6e444e2b6ed90b217781752a27b123bb519c21497c6&=&format=webp&quality=lossless&width=952&height=465"
+                             alt="N2XT Logo" class="h-10 logo-glow">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" class="text-white hover:text-primary-red px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out hover:bg-white/10 nav-link clickable-feedback">Home</a>
+                        <a href="#about" class="text-white hover:text-primary-red px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out hover:bg-white/10 nav-link clickable-feedback">About</a>
+                        <a href="#stats" class="text-white hover:text-primary-red px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out hover:bg-white/10 nav-link clickable-feedback">Stats</a>
+                        <a href="#merch" class="text-white hover:text-primary-red px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out hover:bg-white/10 nav-link clickable-feedback">Merch</a>
+                        <a href="#planner" class="text-white hover:text-primary-red px-3 py-2 rounded-md text-sm font-medium transition duration-300 ease-in-out hover:bg-white/10 nav-link clickable-feedback">Combat Planner</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="https://www.instagram.com/n2xt_ggs?igsh=MXUxbmlpMjhoNjJrcA==" target="_blank" rel="noopener noreferrer" class="social-icon text-white text-xl transition duration-300 ease-in-out" aria-label="N2XT Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://discord.gg/WZj4VEMw" target="_blank" rel="noopener noreferrer" class="wave-btn discord-btn ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white relative overflow-hidden clickable-feedback">
+                    <i class="fab fa-discord mr-2"></i> Join Discord
+                </a>
+            </div>
+            <div class="-mr-2 flex md:hidden">
+                <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white transition duration-300 ease-in-out clickable-feedback" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <i class="fas fa-bars block" id="menu-icon-open"></i>
+                    <i class="fas fa-times hidden" id="menu-icon-close"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu, slides from right -->
+    <div id="mobile-menu">
+        <div class="px-2 pt-8 pb-3 space-y-3 sm:px-3">
+            <a href="#home" class="text-gray-300 hover:text-primary-red block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 nav-link clickable-feedback">Home</a>
+            <a href="#about" class="text-gray-300 hover:text-primary-red block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 nav-link clickable-feedback">About</a>
+            <a href="#stats" class="text-gray-300 hover:text-primary-red block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 nav-link clickable-feedback">Stats</a>
+            <a href="#merch" class="text-gray-300 hover:text-primary-red block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 nav-link clickable-feedback">Merch</a>
+            <a href="#planner" class="text-gray-300 hover:text-primary-red block px-3 py-2 rounded-md text-base font-medium hover:bg-white/10 nav-link clickable-feedback">Combat Planner</a>
+            <div class="pt-4 mt-4 border-t border-gray-700">
+                <div class="flex flex-col space-y-4 px-3">
+                     <a href="https://www.instagram.com/n2xt_ggs?igsh=MXUxbmlpMjhoNjJrcA==" target="_blank" rel="noopener noreferrer" class="social-icon text-gray-300 hover:text-accent-red text-lg transition inline-flex items-center duration-300 ease-in-out" aria-label="N2XT Instagram Mobile">
+                        <i class="fab fa-instagram mr-3 w-5 text-center"></i> Instagram
+                    </a>
+                    <a href="https://discord.gg/WZj4VEMw" target="_blank" rel="noopener noreferrer" class="wave-btn discord-btn inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white relative overflow-hidden w-full clickable-feedback">
+                        <i class="fab fa-discord mr-2"></i> Join Discord
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="relative pt-32 pb-20 md:pt-40 md:pb-28 bg-gradient-to-b from-black via-[color:var(--darker)] to-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="md:w-1/2 mb-12 md:mb-0 text-center md:text-left">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 orbitron pt-6 md:pt-0">
+                    <span class="gradient-text">N2XT</span> <span class="text-white">Generation</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-lg mx-auto md:mx-0">
+                    The elite gaming community where champions are forged. Join our competitive Discord server and take your skills to the next level.
+                </p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
+                    <a href="https://discord.gg/WZj4VEMw" target="_blank" rel="noopener noreferrer" class="wave-btn discord-btn inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white relative overflow-hidden clickable-feedback">
+                        <i class="fab fa-discord mr-2"></i> Join Now
+                    </a>
+                    <a href="#about" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-transparent border-white/30 hover:bg-white/10 transition duration-300 ease-in-out nav-link clickable-feedback">
+                        <i class="fas fa-chevron-down mr-2"></i> Learn More
+                    </a>
+                </div>
+                <div class="mt-8 flex items-center space-x-6 justify-center md:justify-start">
+                    <div class="flex items-center">
+                        <div class="flex -space-x-2">
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-red to-secondary-red flex items-center justify-center border-2 border-black" aria-label="Trophy Icon">
+                                <i class="fas fa-trophy text-white"></i>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-secondary-red to-accent-red flex items-center justify-center border-2 border-black" aria-label="Gamepad Icon">
+                                <i class="fas fa-gamepad text-white"></i>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-red to-accent-red flex items-center justify-center border-2 border-black" aria-label="Users Icon">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400">Join <span class="font-bold text-primary-red">5,000+</span> elite gamers</p>
+                    </div>
+                </div>
+            </div>
+            <div class="md:w-1/2 relative mt-10 md:mt-0">
+                <div class="relative max-w-md mx-auto">
+                    <div class="absolute -top-6 -left-6 w-32 h-32 bg-primary-red rounded-full mix-blend-screen filter blur-2xl opacity-20 animate-blob"></div>
+                    <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-secondary-red rounded-full mix-blend-screen filter blur-2xl opacity-20 animate-blob animation-delay-2000"></div>
+                    <div class="relative rounded-xl overflow-hidden border-2 border-white/10 shadow-2xl shadow-primary-red/20">
+                        <img class="w-full h-auto"
+                             src="https://cdn.pixabay.com/photo/2024/10/30/10/53/ai-generated-9161446_1280.jpg"
+                             alt="N2XT Gaming Scene - Red Theme" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent pointer-events-none"></div>
+</section>
+
+<!-- Stats Section -->
+<section id="stats" class="py-20 bg-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold orbitron">
+                <span class="gradient-text">Community</span> <span class="text-white">Stats</span>
+            </h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-primary-red to-secondary-red mx-auto mt-4 rounded"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Stat Cards (content unchanged) -->
+            <div class="stat-card p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-white">Active Members</h3>
+                    <div class="text-3xl text-primary-red"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="text-4xl font-bold text-white mb-2" id="member-count">5327</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 0%" data-target="85"></div></div>
+                <p class="text-gray-400 text-sm mt-2">85% activity rate</p>
+            </div>
+            <div class="stat-card p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-white">Tournaments Won</h3>
+                    <div class="text-3xl text-primary-red"><i class="fas fa-trophy"></i></div>
+                </div>
+                <div class="text-4xl font-bold text-white mb-2" id="tournament-count">142</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 0%" data-target="68"></div></div>
+                <p class="text-gray-400 text-sm mt-2">68% win rate</p>
+            </div>
+            <div class="stat-card p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-white">Hours Played</h3>
+                    <div class="text-3xl text-primary-red"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="text-4xl font-bold text-white mb-2" id="hours-count">12458</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 0%" data-target="92"></div></div>
+                <p class="text-gray-400 text-sm mt-2">92% engagement</p>
+            </div>
+            <div class="stat-card p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-white">Clan Growth</h3>
+                    <div class="text-3xl text-primary-red"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="text-4xl font-bold text-white mb-2" id="growth-count">+47%</div>
+                <div class="progress-bar"><div class="progress-fill" style="width: 0%" data-target="47"></div></div>
+                <p class="text-gray-400 text-sm mt-2">Last 30 days</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-20 bg-gradient-to-b from-black via-[color:var(--darker)] to-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold orbitron">
+                <span class="gradient-text">About</span> <span class="text-white">N2XT</span>
+            </h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-primary-red to-secondary-red mx-auto mt-4 rounded"></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+            <div class="lg:w-1/2">
+                <div class="relative">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-primary-red to-secondary-red rounded-lg blur opacity-20"></div>
+                    <div class="relative bg-black rounded-lg p-6 border border-white/10 shadow-lg">
+                        <h3 class="text-xl font-bold text-white mb-4">Our Mission</h3>
+                        <p class="text-gray-300 mb-4">N2XT was founded in 2025 with a simple goal: to create the most competitive gaming community on Discord. We bring together elite players from around the world to compete, improve, and dominate.</p>
+                        <p class="text-gray-300 mb-4">Our platform offers exclusive tournaments, professional coaching, and cutting-edge tools to analyze and enhance your gameplay. Whether you're a casual competitor or aspiring pro, N2XT will take your skills to the next level.</p>
+                        <p class="text-gray-300">With dedicated staff, custom bots, and unique training systems, we've built something truly special that continues to push the boundaries of competitive gaming.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:w-1/2 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Card 1: Competitive Focus -->
+                    <div class="flip-card h-full">
+                        <div class="flip-card-inner h-full">
+                            <div class="flip-card-front"><div class="text-primary-red text-4xl mb-4"><i class="fas fa-crosshairs"></i></div><h4 class="text-white font-bold text-xl mb-2">Competitive Focus</h4><p class="text-gray-400 text-sm">Designed for players who want to win</p></div>
+                            <div class="flip-card-back"><h4 class="text-white font-bold text-lg mb-2">Pro-Level Training</h4><p class="text-gray-300 text-sm">Access exclusive drills, VOD reviews, and coaching from top players.</p></div>
+                        </div>
+                    </div>
+                    <!-- Card 2: Advanced Tools -->
+                    <div class="flip-card h-full">
+                        <div class="flip-card-inner h-full">
+                            <div class="flip-card-front"><div class="text-primary-red text-4xl mb-4"><i class="fas fa-tools"></i></div><h4 class="text-white font-bold text-xl mb-2">Advanced Tools</h4><p class="text-gray-400 text-sm">Custom bots and analytics</p></div>
+                            <div class="flip-card-back"><h4 class="text-white font-bold text-lg mb-2">Performance Tracking</h4><p class="text-gray-300 text-sm">Detailed stats, heatmaps, and analysis to identify strengths & weaknesses.</p></div>
+                        </div>
+                    </div>
+                    <!-- Card 3: Zero Toxicity -->
+                    <div class="flip-card h-full">
+                        <div class="flip-card-inner h-full">
+                            <div class="flip-card-front"><div class="text-primary-red text-4xl mb-4"><i class="fas fa-shield-alt"></i></div><h4 class="text-white font-bold text-xl mb-2">Zero Toxicity</h4><p class="text-gray-400 text-sm">Winning with respect</p></div>
+                            <div class="flip-card-back"><h4 class="text-white font-bold text-lg mb-2">Positive Community</h4><p class="text-gray-300 text-sm">We maintain a competitive but respectful environment for focused improvement.</p></div>
+                        </div>
+                    </div>
+                    <!-- Card 4: Daily Events -->
+                    <div class="flip-card h-full">
+                        <div class="flip-card-inner h-full">
+                            <div class="flip-card-front">
+                                <div class="text-primary-red text-4xl mb-4 flex items-center justify-center space-x-3">
+                                    <i class="fas fa-calendar-star"></i>
+                                    <i class="fas fa-clock text-white text-3xl"></i> <!-- Added white clock icon -->
+                                </div>
+                                <h4 class="text-white font-bold text-xl mb-2">Daily Events</h4>
+                                <p class="text-gray-400 text-sm">Always something happening</p>
+                            </div>
+                            <div class="flip-card-back"><h4 class="text-white font-bold text-lg mb-2">Regular Competition</h4><p class="text-gray-300 text-sm">Scrims, tournaments, and special events running 24/7 across multiple titles.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Merchandise Section -->
+<section id="merch" class="py-20 bg-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold orbitron">
+                <span class="gradient-text">N2XT</span> <span class="text-white">Merchandise</span>
+            </h2>
+             <div class="w-20 h-1 bg-gradient-to-r from-primary-red to-secondary-red mx-auto mt-4 rounded"></div>
+            <p class="text-gray-400 max-w-2xl mx-auto mt-6">Represent the N2XT brand with our premium quality merchandise. Limited edition designs available.</p>
+        </div>
+
+        <div class="flex justify-center px-4">
+            <!-- Hoodie -->
+            <div class="merch-item bg-[color:var(--darker)]/50 rounded-xl overflow-hidden border border-white/10 relative group">
+                 <!-- Image Container -->
+                <div class="relative overflow-hidden image-container">
+                    <img src="https://media.discordapp.net/attachments/1359647285461520405/1359648048384573471/file_00000000f13861f8b15ff7a671ebee4b_conversation_id67f6dd47-1214-8007-bfc3-e5b10c0b36f6message_id3cc5df68-c7af-40fe-8a6c-e2ee24588049_1.png?ex=67ff7eab&is=67fe2d2b&hm=c8ecc0480b3d7d18c92f790c99b73cd8d938f0dd034bb599f19aff044fc8a34c&=&format=webp&quality=lossless&width=310&height=465"
+                         alt="N2XT Elite Hoodie - Black with Red Logo" loading="lazy">
+                     <!-- Hover Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                        <button class="enlarge-btn w-full py-3 bg-gradient-to-r from-primary-red to-secondary-red text-white font-bold rounded-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 clickable-feedback">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                 <!-- Content Below Image -->
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-white mb-2">N2XT Elite Hoodie</h3>
+                    <p class="text-gray-400 mb-4 text-sm">Premium quality with embroidered logo</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold text-white">$59.99</span>
+                        <button class="buy-now-btn px-4 py-2 bg-white text-black font-bold rounded-md hover:bg-gray-200 transition duration-300 ease-in-out clickable-feedback">
+                            Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Merch Modal (structure unchanged, JS handles interaction) -->
+        <div id="merch-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[110] flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="relative bg-gray-900 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/10 shadow-xl">
+                <button id="close-modal" class="absolute top-4 right-4 text-white text-2xl hover:text-primary-red transition duration-300 ease-in-out z-10 clickable-feedback" aria-label="Close merchandise details">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="bg-black rounded-lg p-2 border border-white/10"><img id="modal-image" src="" alt="Merchandise Item" class="w-full h-auto max-h-[60vh] object-contain rounded-md"></div>
+                        <div>
+                            <h2 id="modal-title" class="text-2xl lg:text-3xl font-bold text-white mb-2 orbitron"></h2>
+                            <p id="modal-price" class="text-xl text-primary-red font-bold mb-4"></p>
+                            <p id="modal-description" class="text-gray-300 mb-6"></p>
+                            <div class="mb-6">
+                                <h3 class="text-white font-bold mb-2">Size <span id="size-error" class="text-xs text-red-500 ml-2 hidden">Required</span></h3>
+                                <div class="flex flex-wrap gap-2" id="size-options">
+                                    <button class="size-btn px-3 py-1 border border-white/20 rounded hover:border-primary-red hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback" data-value="S">S</button>
+                                    <button class="size-btn px-3 py-1 border border-white/20 rounded hover:border-primary-red hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback" data-value="M">M</button>
+                                    <button class="size-btn px-3 py-1 border border-white/20 rounded hover:border-primary-red hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback" data-value="L">L</button>
+                                    <button class="size-btn px-3 py-1 border border-white/20 rounded hover:border-primary-red hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback" data-value="XL">XL</button>
+                                    <button class="size-btn px-3 py-1 border border-white/20 rounded hover:border-primary-red hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback" data-value="2XL">2XL</button>
+                                </div>
+                            </div>
+                            <div class="mb-6">
+                                <h3 class="text-white font-bold mb-2">Color <span id="color-error" class="text-xs text-red-500 ml-2 hidden">Required</span></h3>
+                                <div class="flex space-x-2" id="color-options">
+                                    <button class="color-btn w-8 h-8 rounded-full bg-black border-2 border-white/20 hover:border-primary-red transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-primary-red clickable-feedback" data-value="Black" aria-label="Select Black Color"></button>
+                                    <button class="color-btn w-8 h-8 rounded-full bg-gray-700 border-2 border-white/20 hover:border-primary-red transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-primary-red clickable-feedback" data-value="Charcoal" aria-label="Select Charcoal Color"></button>
+                                    <button class="color-btn w-8 h-8 rounded-full bg-[color:var(--secondary-red)] border-2 border-white/20 hover:border-primary-red transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-primary-red clickable-feedback" data-value="Dark Red" aria-label="Select Dark Red Color"></button>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center border border-white/20 rounded">
+                                    <button class="quantity-btn px-3 py-1 text-white hover:bg-white/10 rounded-l transition duration-150 ease-in-out clickable-feedback" aria-label="Decrease quantity">-</button>
+                                    <span class="quantity-display px-4 py-1 text-white border-x border-white/20" aria-live="polite">1</span>
+                                    <button class="quantity-btn px-3 py-1 text-white hover:bg-white/10 rounded-r transition duration-150 ease-in-out clickable-feedback" aria-label="Increase quantity">+</button>
+                                </div>
+                                <button id="add-to-cart-btn" class="flex-1 py-3 bg-gradient-to-r from-primary-red to-secondary-red text-white font-bold rounded-md hover:opacity-90 transition duration-300 ease-in-out submit-btn add-to-cart-btn clickable-feedback" disabled>Add to Cart</button>
+                            </div>
+                            <p id="selection-message" class="text-xs text-gray-400 mt-2 h-4"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Clan Combat Planner -->
+<section id="planner" class="py-20 bg-gradient-to-b from-black via-[color:var(--darker)] to-black">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold orbitron">
+                <span class="gradient-text">Clan Combat</span> <span class="text-white">Planner</span>
+            </h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-primary-red to-secondary-red mx-auto mt-4 rounded"></div>
+            <p class="text-gray-400 max-w-2xl mx-auto mt-6">Organize your clan's next competitive event. Our team will review your submission and contact you with details.</p>
+        </div>
+
+        <div class="relative bg-black/60 rounded-xl border border-white/10 p-1 shadow-lg shadow-primary-red/10">
+             <div class="absolute -inset-1.5 bg-gradient-to-r from-primary-red to-secondary-red rounded-xl blur opacity-25 -z-10"></div>
+            <div class="relative bg-[color:var(--dark)] rounded-xl p-8">
+                <form id="combat-form" action="https://hook.eu2.make.com/ssmv4f1ayqewguro9q4xg955ny0q68gs" method="POST">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="clan-name" class="block text-white font-medium mb-2">Clan Name</label>
+                            <input type="text" id="clan-name" name="clan-name" required class="form-input w-full px-4 py-3 rounded-md focus:outline-none placeholder-gray-500" placeholder="Enter your clan's name">
+                        </div>
+                        <div>
+                            <label for="leader-name" class="block text-white font-medium mb-2">Leader Name</label>
+                            <input type="text" id="leader-name" name="leader-name" required class="form-input w-full px-4 py-3 rounded-md focus:outline-none placeholder-gray-500" placeholder="Your in-game name or Discord ID">
+                        </div>
+                    </div>
+                    <div class="mb-6 relative">
+                        <label for="combat-type" class="block text-white font-medium mb-2">Combat Type</label>
+                        <select id="combat-type" name="combat-type" required class="form-input w-full px-4 py-3 rounded-md focus:outline-none appearance-none" style="color-scheme: dark;">
+                            <option value="" disabled selected class="text-gray-500 bg-gray-700">Select combat type...</option>
+                            <option value="Tournament" class="text-white bg-gray-800">Tournament (Official)</option>
+                            <option value="Friendly" class="text-white bg-gray-800">Friendly Match</option>
+                            <option value="Training" class="text-white bg-gray-800">Training Scrim</option>
+                            <option value="Showmatch" class="text-white bg-gray-800">Showmatch</option>
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label for="preferred-date" class="block text-white font-medium mb-2">Preferred Date</label>
+                        <input type="date" id="preferred-date" name="preferred-date" required class="form-input w-full px-4 py-3 rounded-md focus:outline-none" style="color-scheme: dark;">
+                    </div>
+                    <div class="mb-6">
+                        <label for="combat-description" class="block text-white font-medium mb-2">Combat Description</label>
+                        <textarea id="combat-description" name="combat-description" rows="4" required class="form-input w-full px-4 py-3 rounded-md focus:outline-none placeholder-gray-500" placeholder="Include details about format, rules, participating teams, preferred time (with timezone), etc."></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" id="submit-form-btn" class="submit-btn px-8 py-3 text-white font-bold rounded-md relative overflow-hidden text-lg clickable-feedback">
+                            <span id="submit-text">Submit Combat Plan</span>
+                            <div id="submit-loading" class="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-r from-primary-red to-secondary-red">
+                                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div> <!-- Standard spinner here is ok -->
+                            </div>
+                        </button>
+                    </div>
+                </form>
+                <!-- Success/Error Messages (structure unchanged) -->
+                <div id="form-success" class="hidden mt-6 p-4 bg-green-900/30 border border-green-500/50 rounded-md text-center"><div class="text-green-400 text-4xl mb-2"><i class="fas fa-check-circle"></i></div><h3 class="text-xl font-bold text-white mb-2">Submission Successful!</h3><p class="text-gray-300">Our team will review your combat plan and contact you soon.</p></div>
+                <div id="form-error" class="hidden mt-6 p-4 bg-red-900/30 border border-red-500/50 rounded-md text-center"><div class="text-red-400 text-4xl mb-2"><i class="fas fa-exclamation-triangle"></i></div><h3 class="text-xl font-bold text-white mb-2">Submission Failed</h3><p class="text-gray-300" id="error-message">An error occurred. Please check your input or try again later.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- News Ticker -->
+<div class="bg-black border-y border-white/10 py-2 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center">
+            <div class="bg-gradient-to-r from-primary-red to-secondary-red px-4 py-1 text-white font-bold whitespace-nowrap text-xs uppercase tracking-wider rounded-sm">Latest</div>
+            <div class="flex-1 ticker flex items-center overflow-hidden ml-4">
+                <div class="flex items-center whitespace-nowrap text-gray-300 text-sm">
+                    <span class="mx-8">• <span class="text-white font-semibold">N2XT Inferno Series</span> starts July 1st! Sign ups open now! 🔥</span>
+                    <span class="mx-8">• New Apex Legends coaching sessions added - check Discord announcements.</span>
+                    <span class="mx-8">• Limited Edition <span class="text-primary-red">REDLINE</span> Hoodie drops next week! Don't miss out.</span>
+                    <span class="mx-8">• Follow us on Instagram @n2xt_ggs for clips and updates!</span>
+                    <!-- Duplicate items for seamless scroll -->
+                    <span class="mx-8">• <span class="text-white font-semibold">N2XT Inferno Series</span> starts July 1st! Sign ups open now! 🔥</span>
+                    <span class="mx-8">• New Apex Legends coaching sessions added - check Discord announcements.</span>
+                    <span class="mx-8">• Limited Edition <span class="text-primary-red">REDLINE</span> Hoodie drops next week! Don't miss out.</span>
+                    <span class="mx-8">• Follow us on Instagram @n2xt_ggs for clips and updates!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-b from-[color:var(--darker)] to-black">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 orbitron">
+            Ready to <span class="gradient-text">Dominate</span> the Competition?
+        </h2>
+        <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Join N2XT today and unlock exclusive tournaments, pro training resources, and connect with a dedicated community of elite gamers.</p>
+        <a href="https://discord.gg/WZj4VEMw" target="_blank" rel="noopener noreferrer" class="wave-btn discord-btn inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-md text-white relative overflow-hidden shadow-lg shadow-primary-red/20 hover:shadow-primary-red/40 clickable-feedback">
+            <i class="fab fa-discord mr-3 text-xl"></i> Join N2XT on Discord
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-black py-12 border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="md:col-span-2">
+                 <a href="#home" aria-label="N2XT Home Footer"><img src="https://media.discordapp.net/attachments/1309459159049179200/1361668011039129764/Picsart_25-04-15_12-42-22-061.png?ex=67ff97a8&is=67fe4628&hm=3829914fc459b295a857e6e444e2b6ed90b217781752a27b123bb519c21497c6&=&format=webp&quality=lossless&width=952&height=465" alt="N2XT Logo Footer" class="h-12 mb-4 logo-glow"></a>
+                <p class="text-gray-400 mb-6 text-sm">The premier esports community driving the next generation of competitive gamers. Elevate your play, connect with the elite.</p>
+                <div class="flex space-x-5">
+                    <a href="https://www.instagram.com/n2xt_ggs?igsh=MXUxbmlpMjhoNjJrcA==" target="_blank" rel="noopener noreferrer" class="social-icon text-gray-400 hover:text-accent-red text-xl transition duration-300 ease-in-out" aria-label="N2XT Instagram Footer"><i class="fab fa-instagram"></i></a>
+                    <a href="https://discord.gg/WZj4VEMw" target="_blank" rel="noopener noreferrer" class="social-icon text-gray-400 hover:text-[color:var(--discord-purple)] text-xl transition duration-300 ease-in-out" aria-label="N2XT Discord Footer"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Quick Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="#home" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm nav-link clickable-feedback">Home</a></li>
+                    <li><a href="#about" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm nav-link clickable-feedback">About Us</a></li>
+                    <li><a href="#stats" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm nav-link clickable-feedback">Stats</a></li>
+                    <li><a href="#merch" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm nav-link clickable-feedback">Merchandise</a></li>
+                    <li><a href="#planner" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm nav-link clickable-feedback">Combat Planner</a></li>
+                </ul>
+            </div>
+            <div>
+                 <h4 class="text-white font-bold mb-4 uppercase text-sm tracking-wider">Legal</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback">Privacy Policy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback">Terms of Service</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback">Community Rules</a></li>
+                     <li><a href="mailto:sjoooo255@gmail.com" class="text-gray-400 hover:text-primary-red transition duration-300 ease-in-out text-sm clickable-feedback">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-500 text-xs mb-4 md:mb-0">© <span id="current-year"></span> N2XT Gaming Community. All Rights Reserved.</p>
+            <a href="mailto:sjoooo255@gmail.com" class="inline-flex items-center text-xs font-medium text-gray-400 hover:text-primary-red transition duration-300 ease-in-out clickable-feedback"><i class="fas fa-envelope mr-2"></i> sjoooo255@gmail.com</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        const body = document.body;
+        const preloader = document.getElementById('preloader');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const menuIconOpen = document.getElementById('menu-icon-open');
+        const menuIconClose = document.getElementById('menu-icon-close');
+        const navLinks = document.querySelectorAll('.nav-link'); // Includes mobile, desktop, and footer links
+
+        // --- Preloader Logic ---
+        function hidePreloader() {
+             if (preloader) {
+                preloader.classList.add('hidden');
+             }
+             body.classList.remove('loading');
+             body.classList.add('loaded'); // Trigger fade-in of body content
+
+             // Initialize animations *after* preloader is gone
+             initGsapAnimations();
+             animateStats(); // Needs ScrollTrigger, init after GSAP register
+        }
+
+        window.onload = () => {
+             // Ensure preloader is visible for at least 1.5 seconds
+             setTimeout(hidePreloader, 1500);
+        };
+
+        // --- Mobile Menu Toggle ---
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.contains('menu-open');
+            mobileMenu.classList.toggle('menu-open', !isOpen);
+            menuOverlay.classList.toggle('active', !isOpen);
+            body.classList.toggle('menu-open', !isOpen); // Toggle body class for overflow:hidden
+            menuIconOpen.classList.toggle('hidden', !isOpen);
+            menuIconClose.classList.toggle('hidden', isOpen);
+            mobileMenuButton.setAttribute('aria-expanded', String(!isOpen));
+        }
+
+        mobileMenuButton.addEventListener('click', toggleMenu);
+        menuOverlay.addEventListener('click', toggleMenu);
+
+        // --- Navigation Link Handling (Mobile Menu Closure + Smooth Scroll) ---
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetId = link.getAttribute('href');
+
+                // Check if it's an internal link (#...)
+                if (targetId && targetId.startsWith('#')) {
+                    // If the mobile menu is open, close it first.
+                    if (mobileMenu.classList.contains('menu-open')) {
+                        toggleMenu();
+                        // Add a small delay to allow menu closing animation before scroll starts,
+                        // especially important if not relying purely on CSS smooth scroll.
+                        // e.preventDefault(); // Keep this if you want JS control over scroll
+                        // setTimeout(() => {
+                        //     const targetElement = document.querySelector(targetId);
+                        //     if (targetElement) {
+                        //         const headerOffset = 70; // Adjust as needed
+                        //         const elementPosition = targetElement.getBoundingClientRect().top;
+                        //         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        //         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                        //     }
+                        // }, 50); // Small delay
+                    }
+                    // Let the browser handle the smooth scroll via CSS `scroll-behavior: smooth;`
+                    // No need to preventDefault or manually scroll if CSS handles it.
+
+                } else if (mobileMenu.classList.contains('menu-open')) {
+                     // If it's an external link or non-hash link, just close the menu
+                     toggleMenu();
+                }
+            });
+        });
+
+
+        // --- Particle Creation ---
+        function createParticles() { /* ... (particle code unchanged) ... */
+            const container = document.getElementById('particles');
+            if (!container) return;
+            container.innerHTML = ''; const particleCount = 35;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div'); particle.classList.add('particle');
+                const size = Math.random() * 3 + 1; particle.style.width = `${size}px`; particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`; particle.style.top = `${Math.random() * 100}%`;
+                particle.style.opacity = Math.random() * 0.4 + 0.1;
+                const duration = Math.random() * 25 + 15; const delay = Math.random() * 10;
+                particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
+                container.appendChild(particle);
+            }
+        }
+
+        // --- Stats Animation on Scroll ---
+        function animateStats() { /* ... (stats animation code unchanged, relies on ScrollTrigger) ... */
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                const progressFill = card.querySelector('.progress-fill');
+                const statNumberEl = card.querySelector('div[id$="-count"]');
+                ScrollTrigger.create({
+                    trigger: card, start: "top 85%", once: true,
+                    onEnter: () => {
+                        if (progressFill) { const targetWidth = progressFill.dataset.target || '0'; gsap.to(progressFill, { width: `${targetWidth}%`, duration: 1.5, ease: 'power2.out' }); }
+                        if (statNumberEl) {
+                            const targetText = statNumberEl.textContent || '0'; const isPercentage = targetText.includes('%'); let targetNumber = parseFloat(targetText.replace(/[^0-9.-]/g, '')) || 0; let startValue = { val: 0 };
+                            gsap.to(startValue, {
+                                val: targetNumber, duration: 2, ease: 'power1.out',
+                                onUpdate: () => { let displayValue = Math.floor(startValue.val); let prefix = targetText.startsWith('+') ? '+' : ''; let suffix = isPercentage ? '%' : ''; statNumberEl.textContent = prefix + displayValue.toLocaleString() + suffix; },
+                                onComplete: () => { statNumberEl.textContent = targetText; }
+                            });
+                        }
+                    }
+                });
+            });
+         }
+
+        // --- Merch Modal Functionality ---
+        function setupMerchModal() { /* ... (merch modal JS unchanged) ... */
+             const enlargeButtons = document.querySelectorAll('.enlarge-btn, .buy-now-btn');
+            const modal = document.getElementById('merch-modal'); const closeModalBtn = document.getElementById('close-modal');
+            const modalImage = document.getElementById('modal-image'); const modalTitle = document.getElementById('modal-title');
+            const modalPrice = document.getElementById('modal-price'); const modalDescription = document.getElementById('modal-description');
+            const sizeOptionsContainer = document.getElementById('size-options'); const colorOptionsContainer = document.getElementById('color-options');
+            const quantityBtns = modal.querySelectorAll('.quantity-btn'); const quantityDisplay = modal.querySelector('.quantity-display');
+            const addToCartBtn = document.getElementById('add-to-cart-btn'); const selectionMessage = document.getElementById('selection-message');
+            if (!modal || !closeModalBtn || !sizeOptionsContainer || !colorOptionsContainer || !addToCartBtn) { console.warn("Merch modal elements missing."); return; }
+            let selectedSize = null; let selectedColor = null; let quantity = 1;
+            function updateCartButtonState() {
+                if (selectedSize && selectedColor) {
+                    addToCartBtn.disabled = false; selectionMessage.textContent = `Selected: ${selectedSize}, ${selectedColor}, Qty: ${quantity}`;
+                    document.getElementById('size-error')?.classList.add('hidden'); document.getElementById('color-error')?.classList.add('hidden');
+                } else {
+                    addToCartBtn.disabled = true; let msg = "Please select "; if (!selectedSize) msg += "Size"; if (!selectedSize && !selectedColor) msg += " and "; if (!selectedColor) msg += "Color"; selectionMessage.textContent = msg + ".";
+                }
+            }
+            sizeOptionsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('size-btn')) { sizeOptionsContainer.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected')); e.target.classList.add('selected'); selectedSize = e.target.dataset.value; updateCartButtonState(); } });
+            colorOptionsContainer.addEventListener('click', (e) => { if (e.target.classList.contains('color-btn')) { colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected')); e.target.classList.add('selected'); selectedColor = e.target.dataset.value; updateCartButtonState(); } });
+            quantityBtns.forEach(btn => { btn.addEventListener('click', () => { const operation = btn.textContent; if (operation === '+' ) quantity++; else if (operation === '-' && quantity > 1) quantity--; quantityDisplay.textContent = quantity; updateCartButtonState(); }); });
+             addToCartBtn.addEventListener('click', () => {
+                 if (!selectedSize) { document.getElementById('size-error')?.classList.remove('hidden'); }
+                 if (!selectedColor) { document.getElementById('color-error')?.classList.remove('hidden'); }
+                 if (selectedSize && selectedColor) { console.log(`Adding to cart: ${quantity} x ${selectedSize} ${selectedColor} ${modalTitle.textContent} (${modalPrice.textContent})`); selectionMessage.textContent = "Added to cart!"; /* closeModal(); */ }
+             });
+            enlargeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const merchItem = this.closest('.merch-item'); if (!merchItem) return;
+                    const imageSrc = merchItem.querySelector('img')?.src || ''; const title = merchItem.querySelector('h3')?.textContent || 'Product Title'; const price = merchItem.querySelector('.text-xl.font-bold')?.textContent || '$?.??'; const description = merchItem.querySelector('p.text-gray-400')?.textContent || 'Product description unavailable.';
+                    modalImage.src = imageSrc; modalImage.alt = title; modalTitle.textContent = title; modalPrice.textContent = price; modalDescription.textContent = description;
+                    selectedSize = null; selectedColor = null; quantity = 1;
+                    sizeOptionsContainer.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected')); colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+                    quantityDisplay.textContent = quantity; document.getElementById('size-error')?.classList.add('hidden'); document.getElementById('color-error')?.classList.add('hidden'); updateCartButtonState();
+                    modal.classList.remove('hidden'); gsap.to(modal, { opacity: 1, duration: 0.3 }); body.style.overflow = 'hidden';
+                });
+            });
+            function closeModal() { gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => { modal.classList.add('hidden'); body.style.overflow = ''; }}); }
+            closeModalBtn.addEventListener('click', closeModal); modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+        }
+
+        // --- Combat Form Submission Handling ---
+        function setupCombatForm() { /* ... (combat form JS unchanged) ... */
+             const form = document.getElementById('combat-form'); const submitBtn = document.getElementById('submit-form-btn'); const submitText = document.getElementById('submit-text'); const submitLoading = document.getElementById('submit-loading'); const formSuccess = document.getElementById('form-success'); const formError = document.getElementById('form-error'); const errorMessageEl = document.getElementById('error-message');
+            if (!form || !submitBtn || !submitText || !submitLoading || !formSuccess || !formError || !errorMessageEl) { console.warn("Combat form elements not found."); return; }
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); submitText.classList.add('hidden'); submitLoading.classList.remove('hidden'); submitBtn.disabled = true; formSuccess.classList.add('hidden'); formError.classList.add('hidden');
+                const formData = new FormData(form); const webhookURL = form.action;
+                fetch(webhookURL, { method: 'POST', body: formData })
+                .then(response => { if (!response.ok) { return response.text().then(text => { throw new Error(`Server responded with ${response.status}: ${text || 'No details'}`); }); } return response.text(); })
+                .then(data => { console.log('Success:', data); formSuccess.classList.remove('hidden'); form.reset(); gsap.from(formSuccess, { opacity: 0, y: 20, duration: 0.5 }); })
+                .catch((error) => { console.error('Error:', error); errorMessageEl.textContent = `Submission failed: ${error.message}. Please check your connection or try again.`; formError.classList.remove('hidden'); gsap.from(formError, { opacity: 0, y: 20, duration: 0.5 }); })
+                .finally(() => { submitText.classList.remove('hidden'); submitLoading.classList.add('hidden'); submitBtn.disabled = false; });
+            });
+        }
+
+        // --- Ripple Effect for Buttons ---
+        function setupRippleEffects() { /* ... (ripple effect JS unchanged) ... */
+             const buttons = document.querySelectorAll('.wave-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (this.disabled) return; const existingRipple = this.querySelector('.ripple'); if (existingRipple) { existingRipple.remove(); }
+                    const rect = this.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; const ripple = document.createElement('span'); ripple.classList.add('ripple'); ripple.style.left = `${x}px`; ripple.style.top = `${y}px`; this.insertBefore(ripple, this.firstChild);
+                    gsap.to(ripple, { scale: 4, opacity: 0, duration: 0.6, ease: 'linear', onComplete: () => ripple.remove() });
+                });
+            });
+        }
+
+        // --- GSAP Entrance Animations (Called after preloader) ---
+         function initGsapAnimations() { /* ... (GSAP animations unchanged) ... */
+             gsap.from('.logo-glow', { duration: 1, opacity: 0, delay: 0.2, ease: "power2.out" });
+            gsap.from('#home h1, #home p, #home .flex-col > a, #home .mt-8', { duration: 0.8, y: 30, opacity: 0, stagger: 0.15, delay: 0.5, ease: "power3.out" });
+            gsap.from('#home .relative.max-w-md', { duration: 1, x: 50, opacity: 0, delay: 0.8, ease: "power3.out" });
+            gsap.utils.toArray('.stat-card').forEach((card, index) => { gsap.from(card, { scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none none" }, y: 50, opacity: 0, duration: 0.6, delay: index * 0.1, ease: "back.out(1.4)" }); });
+            gsap.from('#about .lg\\:w-1\\/2:first-child .relative.bg-black', { scrollTrigger: { trigger: '#about .lg\\:w-1\\/2:first-child', start: "top 80%", toggleActions: "play none none none" }, x: -50, opacity: 0, duration: 0.8, ease: "power2.out" });
+            gsap.utils.toArray('.flip-card').forEach((card, index) => { gsap.from(card, { scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none none" }, scale: 0.8, opacity: 0, duration: 0.5, delay: index * 0.1, ease: "back.out(1.7)" }); });
+            gsap.utils.toArray('.merch-item').forEach((item, index) => { gsap.from(item, { scrollTrigger: { trigger: item, start: "top 85%", toggleActions: "play none none none" }, y: 60, opacity: 0, duration: 0.7, delay: index * 0.15, ease: "power2.out" }); });
+            gsap.from('#planner .relative.bg-\\[color\\:var\\(--dark\\)\\]', { scrollTrigger: { trigger: '#planner', start: "top 70%", toggleActions: "play none none none" }, y: 50, opacity: 0, duration: 1, ease: "power3.out" });
+         }
+
+         // Set current year in footer
+         const currentYearElement = document.getElementById('current-year');
+         if (currentYearElement) { currentYearElement.textContent = new Date().getFullYear(); }
+
+        // --- Initialize Non-Animation Functions Early ---
+        createParticles(); // Can run early
+        setupMerchModal(); // Setup listeners
+        setupCombatForm(); // Setup listeners
+        setupRippleEffects(); // Setup listeners
+        // Note: initGsapAnimations() and animateStats() are called inside hidePreloader()
+
+    }); // End DOMContentLoaded
+</script>
+</body>
+</html>
