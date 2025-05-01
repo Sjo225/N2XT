@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>N2XT - Elite Gaming Community</title>
+    <link rel="icon" type="image/webp" href="https://media-hosting.imagekit.io/e652a7375e1b458e/Picsart_25-04-09_23-28-21-681.webp?Expires=1840713283&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=qD6d2vbNYXOzIiUMnx5u0JxPWtZCzn1hU1Hxn3AiE3FlJKI6zocyk7hqCxequnlQx7ChduCrIs6VPlFm2ztAlh5Flo6E2OL57DkbRm1g0ccnsB0vRS8wwsLQEOmhIMx7ItOMCyF8LTO0bAGUfjCb7Y0nEv81NboX1Rt1HTNuiVc4RcjmJ5MAJwob80pdXwhJTYuCR1111Z3rNJHy6Dx30OCY~18jv-LcmxC-qpGJw4ahKzQnyTXxyeYHJFOmSX91aB-svBxXQw6sm7OrhWj3z7cFqLA2YK7QbOzGJPqnbukpLYHXnisjn~MmDBmNBfbe-bug~s8URjzLblF3U1tfIQ__"> <!-- Added Favicon Link -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script> <!-- Added ScrollTrigger -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
+        /* --- All your existing CSS styles remain here --- */
+         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
 
         :root {
             /* Red Theme */
@@ -320,10 +320,10 @@
              box-shadow: 0 0 5px rgba(255, 31, 31, 0.5);
         }
         .color-btn.selected {
-            ring: 2px;
-            ring-offset: 2px;
-            ring-offset-gray-900;
-            ring-color: var(--primary-red);
+            /* Using ring utilities requires Tailwind JIT or configuration */
+             /* Applying equivalent styles manually: */
+             outline: 2px solid var(--primary-red);
+             outline-offset: 2px;
         }
         .add-to-cart-btn:disabled {
             opacity: 0.5;
@@ -338,7 +338,7 @@
 
     </style>
 </head>
-<body class="page-transition">
+<body>
     <!-- Particle Background -->
     <div id="particles" class="fixed top-0 left-0 w-full h-full -z-10"></div>
     <!-- Mobile Menu Overlay -->
@@ -657,7 +657,7 @@
             <!-- Hoodie -->
             <div class="merch-item bg-[color:var(--darker)]/50 rounded-xl overflow-hidden border border-white/10 relative group">
                 <div class="relative overflow-hidden aspect-w-1 aspect-h-1">
-                 <img src="https://i.imghippo.com/files/mVwU9883c.png" 
+                 <img src="https://i.imghippo.com/files/mVwU9883c.png"
                          alt="N2XT Elite Hoodie - Black with Red Logo" class="w-full h-full object-contain p-4 bg-gray-900" loading="lazy"> <!-- Added dark bg to img container -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                         <button class="enlarge-btn w-full py-3 bg-gradient-to-r from-primary-red to-secondary-red text-white font-bold rounded-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -915,6 +915,7 @@
 </footer>
 
 <script>
+    // --- All your existing JavaScript remains here ---
     document.addEventListener('DOMContentLoaded', function() {
         // Register GSAP plugins
         gsap.registerPlugin(ScrollTrigger);
@@ -935,8 +936,9 @@
             body.classList.toggle('menu-open', !isOpen);
             menuIconOpen.classList.toggle('hidden', !isOpen);
             menuIconClose.classList.toggle('hidden', isOpen);
-            mobileMenuButton.setAttribute('aria-expanded', !isOpen);
+            mobileMenuButton.setAttribute('aria-expanded', String(!isOpen)); // Ensure boolean is string
         }
+
 
         mobileMenuButton.addEventListener('click', toggleMenu);
         menuOverlay.addEventListener('click', toggleMenu);
@@ -986,7 +988,7 @@
                 particle.style.height = `${size}px`;
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
-                particle.style.opacity = Math.random() * 0.4 + 0.1;
+                particle.style.opacity = String(Math.random() * 0.4 + 0.1); // Ensure string
                 const duration = Math.random() * 25 + 15;
                 const delay = Math.random() * 10;
                 particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
@@ -1007,12 +1009,12 @@
                     once: true, // Only animate once
                     onEnter: () => {
                         // Animate Progress Bar
-                        if (progressFill) {
+                        if (progressFill && progressFill instanceof HTMLElement) { // Check if element exists and is HTMLElement
                              const targetWidth = progressFill.dataset.target || '0';
                              gsap.to(progressFill, { width: `${targetWidth}%`, duration: 1.5, ease: 'power2.out' });
                         }
                         // Animate Number Count
-                        if (statNumberEl) {
+                        if (statNumberEl && statNumberEl instanceof HTMLElement) { // Check if element exists and is HTMLElement
                             const targetText = statNumberEl.textContent || '0';
                             const isPercentage = targetText.includes('%');
                             let targetNumber = parseFloat(targetText.replace(/[^0-9.-]/g, '')) || 0;
@@ -1023,9 +1025,11 @@
                                     let displayValue = Math.floor(startValue.val);
                                     let prefix = targetText.startsWith('+') ? '+' : '';
                                     let suffix = isPercentage ? '%' : '';
-                                    statNumberEl.textContent = prefix + displayValue.toLocaleString() + suffix;
+                                    if (statNumberEl) { // Check again inside closure
+                                        statNumberEl.textContent = prefix + displayValue.toLocaleString() + suffix;
+                                    }
                                 },
-                                onComplete: () => { statNumberEl.textContent = targetText; } // Ensure final value is exact
+                                onComplete: () => { if (statNumberEl) { statNumberEl.textContent = targetText; } } // Ensure final value is exact
                             });
                         }
                     }
@@ -1044,14 +1048,17 @@
             const modalDescription = document.getElementById('modal-description');
             const sizeOptionsContainer = document.getElementById('size-options');
             const colorOptionsContainer = document.getElementById('color-options');
-            const quantityBtns = modal.querySelectorAll('.quantity-btn');
-            const quantityDisplay = modal.querySelector('.quantity-display');
+            const quantityBtns = modal?.querySelectorAll('.quantity-btn'); // Added null check
+            const quantityDisplay = modal?.querySelector('.quantity-display'); // Added null check
             const addToCartBtn = document.getElementById('add-to-cart-btn');
             const selectionMessage = document.getElementById('selection-message');
+            const sizeError = document.getElementById('size-error');
+            const colorError = document.getElementById('color-error');
 
-            if (!modal || !closeModalBtn || !sizeOptionsContainer || !colorOptionsContainer || !addToCartBtn) {
-                 console.warn("Merch modal elements missing, functionality may be limited.");
-                 return;
+
+            if (!modal || !closeModalBtn || !modalImage || !modalTitle || !modalPrice || !modalDescription || !sizeOptionsContainer || !colorOptionsContainer || !quantityBtns || !quantityDisplay || !addToCartBtn || !selectionMessage || !sizeError || !colorError) {
+                 console.warn("One or more Merch modal elements missing, functionality may be limited.");
+                 return; // Exit if essential elements are missing
             }
 
             let selectedSize = null;
@@ -1063,8 +1070,8 @@
                     addToCartBtn.disabled = false;
                     selectionMessage.textContent = `Selected: ${selectedSize}, ${selectedColor}, Qty: ${quantity}`;
                      // Hide error messages if shown
-                    document.getElementById('size-error')?.classList.add('hidden');
-                    document.getElementById('color-error')?.classList.add('hidden');
+                    sizeError.classList.add('hidden');
+                    colorError.classList.add('hidden');
                 } else {
                     addToCartBtn.disabled = true;
                     let msg = "Please select ";
@@ -1077,20 +1084,28 @@
 
             // Event delegation for size buttons
             sizeOptionsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('size-btn')) {
+                if (e.target instanceof HTMLButtonElement && e.target.classList.contains('size-btn')) {
                     sizeOptionsContainer.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
                     e.target.classList.add('selected');
-                    selectedSize = e.target.dataset.value;
+                    selectedSize = e.target.dataset.value ?? null; // Use nullish coalescing
                     updateCartButtonState();
                 }
             });
 
             // Event delegation for color buttons
             colorOptionsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('color-btn')) {
-                    colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+                 if (e.target instanceof HTMLButtonElement && e.target.classList.contains('color-btn')) {
+                    colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                        // Reset manual outline if needed, though Tailwind ring utilities might handle this better if configured
+                        btn.style.outline = 'none';
+                    });
                     e.target.classList.add('selected');
-                    selectedColor = e.target.dataset.value;
+                    // Apply ring-like styles manually if Tailwind ring utilities aren't working/configured
+                    e.target.style.outline = '2px solid var(--primary-red)';
+                    e.target.style.outlineOffset = '2px';
+
+                    selectedColor = e.target.dataset.value ?? null; // Use nullish coalescing
                     updateCartButtonState();
                 }
             });
@@ -1098,32 +1113,40 @@
              // Quantity buttons
             quantityBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const operation = btn.textContent;
+                    const operation = btn.textContent?.trim(); // Trim whitespace
                     if (operation === '+' ) {
                         quantity++;
                     } else if (operation === '-' && quantity > 1) {
                         quantity--;
                     }
-                    quantityDisplay.textContent = quantity;
+                    quantityDisplay.textContent = String(quantity); // Ensure string
                     updateCartButtonState(); // Update message with new quantity if needed
                 });
             });
 
              // Add to Cart Button Action (Placeholder)
              addToCartBtn.addEventListener('click', () => {
+                 sizeError.classList.add('hidden'); // Reset errors first
+                 colorError.classList.add('hidden');
+
+                 let hasError = false;
                  if (!selectedSize) {
-                    document.getElementById('size-error')?.classList.remove('hidden');
+                    sizeError.classList.remove('hidden');
+                    hasError = true;
                  }
                  if (!selectedColor) {
-                    document.getElementById('color-error')?.classList.remove('hidden');
+                    colorError.classList.remove('hidden');
+                    hasError = true;
                  }
 
-                 if (selectedSize && selectedColor) {
+                 if (!hasError) {
                     console.log(`Adding to cart: ${quantity} x ${selectedSize} ${selectedColor} ${modalTitle.textContent} (${modalPrice.textContent})`);
                     // Here you would typically add the item to a cart object/API
                     selectionMessage.textContent = "Added to cart!"; // Provide feedback
                     // Optionally close modal or reset state after adding
                     // closeModal();
+                 } else {
+                     selectionMessage.textContent = "Please complete selection."; // Update general message if errors exist
                  }
              });
 
@@ -1132,27 +1155,39 @@
             enlargeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const merchItem = this.closest('.merch-item'); if (!merchItem) return;
-                    const imageSrc = merchItem.querySelector('img')?.src || '';
-                    const title = merchItem.querySelector('h3')?.textContent || 'Product Title';
-                    const price = merchItem.querySelector('.text-xl.font-bold')?.textContent || '$?.??';
-                    const description = merchItem.querySelector('p.text-gray-400')?.textContent || 'Product description unavailable.';
+                    const imageElement = merchItem.querySelector('img');
+                    const titleElement = merchItem.querySelector('h3');
+                    const priceElement = merchItem.querySelector('.text-xl.font-bold.text-white'); // More specific selector
+                    const descriptionElement = merchItem.querySelector('p.text-gray-400.mb-4.text-sm'); // More specific selector
 
-                    modalImage.src = imageSrc; modalImage.alt = title;
-                    modalTitle.textContent = title; modalPrice.textContent = price;
+                    const imageSrc = imageElement?.src || '';
+                    const title = titleElement?.textContent || 'Product Title';
+                    const price = priceElement?.textContent || '$?.??';
+                    const description = descriptionElement?.textContent || 'Product description unavailable.';
+
+
+                    if (modalImage instanceof HTMLImageElement) { // Type check
+                         modalImage.src = imageSrc; modalImage.alt = title;
+                    }
+                    modalTitle.textContent = title;
+                    modalPrice.textContent = price;
                     modalDescription.textContent = description;
 
                     // Reset selections when opening
                     selectedSize = null; selectedColor = null; quantity = 1;
                     sizeOptionsContainer.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
-                    colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
-                    quantityDisplay.textContent = quantity;
-                    document.getElementById('size-error')?.classList.add('hidden');
-                    document.getElementById('color-error')?.classList.add('hidden');
+                    colorOptionsContainer.querySelectorAll('.color-btn').forEach(btn => {
+                         btn.classList.remove('selected');
+                         btn.style.outline = 'none'; // Reset manual outline
+                     });
+                    quantityDisplay.textContent = String(quantity); // Ensure string
+                    sizeError.classList.add('hidden');
+                    colorError.classList.add('hidden');
                     updateCartButtonState(); // Ensure button is disabled initially
 
                     modal.classList.remove('hidden');
                     gsap.to(modal, { opacity: 1, duration: 0.3 });
-                    body.style.overflow = 'hidden'; // Prevent body scroll when modal open
+                    if (body) body.style.overflow = 'hidden'; // Prevent body scroll when modal open
                 });
             });
 
@@ -1160,7 +1195,7 @@
             function closeModal() {
                 gsap.to(modal, { opacity: 0, duration: 0.3, onComplete: () => {
                     modal.classList.add('hidden');
-                    body.style.overflow = ''; // Restore body scroll
+                    if (body) body.style.overflow = ''; // Restore body scroll
                 }});
             }
             closeModalBtn.addEventListener('click', closeModal);
@@ -1183,9 +1218,23 @@
             const errorMessageEl = document.getElementById('error-message');
 
             if (!form || !submitBtn || !submitText || !submitLoading || !formSuccess || !formError || !errorMessageEl) {
-                console.warn("Combat form elements not found.");
-                return;
+                console.warn("One or more Combat form elements not found.");
+                return; // Exit if essential elements are missing
             }
+
+             // Ensure elements are HTML elements before adding/removing classes
+             const elementsToCheck = [submitText, submitLoading, formSuccess, formError];
+             for (const el of elementsToCheck) {
+                 if (!(el instanceof HTMLElement)) {
+                     console.error("Form element is not an HTMLElement:", el);
+                     return;
+                 }
+             }
+              if (!(submitBtn instanceof HTMLButtonElement)) {
+                 console.error("Submit button is not a button element:", submitBtn);
+                 return;
+             }
+
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -1214,12 +1263,16 @@
                 .then(data => {
                     console.log('Success:', data);
                     formSuccess.classList.remove('hidden');
-                    form.reset(); // Clear the form
+                    if (form instanceof HTMLFormElement) form.reset(); // Type check before reset
                     gsap.from(formSuccess, { opacity: 0, y: 20, duration: 0.5 });
                 })
                 .catch((error) => {
                     console.error('Error:', error);
-                    errorMessageEl.textContent = `Submission failed: ${error.message}. Please check your connection or try again.`;
+                    if (error instanceof Error) { // Check if error is an Error object
+                       errorMessageEl.textContent = `Submission failed: ${error.message}. Please check your connection or try again.`;
+                    } else {
+                       errorMessageEl.textContent = `An unknown submission error occurred. Please try again.`;
+                    }
                     formError.classList.remove('hidden');
                     gsap.from(formError, { opacity: 0, y: 20, duration: 0.5 });
                 })
@@ -1236,9 +1289,11 @@
         function setupRippleEffects() {
             const buttons = document.querySelectorAll('.wave-btn');
             buttons.forEach(button => {
+                if (!(button instanceof HTMLButtonElement) && !(button instanceof HTMLAnchorElement)) return; // Ensure it's a button or anchor
+
                 button.addEventListener('click', function(e) {
                     // Prevent ripple on disabled buttons
-                    if (this.disabled) return;
+                    if (button instanceof HTMLButtonElement && button.disabled) return; // Check disabled only for buttons
 
                     // Remove existing ripple if one is already animating
                     const existingRipple = this.querySelector('.ripple');
@@ -1247,8 +1302,12 @@
                     }
 
                     const rect = this.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
+                    // Ensure click coordinates are valid numbers
+                    const clientX = typeof e.clientX === 'number' ? e.clientX : rect.left + rect.width / 2;
+                    const clientY = typeof e.clientY === 'number' ? e.clientY : rect.top + rect.height / 2;
+                    const x = clientX - rect.left;
+                    const y = clientY - rect.top;
+
                     const ripple = document.createElement('span');
                     ripple.classList.add('ripple');
                     ripple.style.left = `${x}px`;
@@ -1273,7 +1332,7 @@
             gsap.from('.logo-glow', { duration: 1, opacity: 0, delay: 0.2, ease: "power2.out" });
 
             // Staggered fade-up for hero text elements
-            gsap.from('#home h1, #home p, #home .flex-col > a, #home .mt-8', {
+            gsap.from('#home h1, #home p, #home .flex-col.sm\\:flex-row > a, #home .mt-8', { // Refined selector for buttons
                 duration: 0.8,
                 y: 30,
                 opacity: 0,
@@ -1282,8 +1341,9 @@
                 ease: "power3.out"
             });
 
+
             // Fade-in from right for hero image container
-            gsap.from('#home .relative.max-w-md', {
+            gsap.from('#home .md\\:w-1\\/2.relative', { // More specific selector
                  duration: 1,
                  x: 50,
                  opacity: 0,
@@ -1293,8 +1353,9 @@
 
             // Staggered fade-up for stat cards using ScrollTrigger
             gsap.utils.toArray('.stat-card').forEach((card, index) => {
+                if (!(card instanceof HTMLElement)) return; // Type check
                 gsap.from(card, {
-                    scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none none" },
+                    scrollTrigger: { trigger: card, start: "top 90%", toggleActions: "play none none none", once: true }, // Added once
                     y: 50,
                     opacity: 0,
                     duration: 0.6,
@@ -1304,17 +1365,22 @@
             });
 
             // About section animations
-            gsap.from('#about .lg\\:w-1\\/2:first-child .relative.bg-black', {
-                scrollTrigger: { trigger: '#about .lg\\:w-1\\/2:first-child', start: "top 80%", toggleActions: "play none none none" },
-                x: -50,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out"
-             });
+            const aboutMissionCard = document.querySelector('#about .lg\\:w-1\\/2:first-child .relative.bg-black');
+            if (aboutMissionCard instanceof HTMLElement) { // Type check
+                 gsap.from(aboutMissionCard, {
+                    scrollTrigger: { trigger: aboutMissionCard, start: "top 80%", toggleActions: "play none none none", once: true }, // Added once
+                    x: -50,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                 });
+            }
+
              // Staggered scale-in for flip cards
             gsap.utils.toArray('.flip-card').forEach((card, index) => {
+                 if (!(card instanceof HTMLElement)) return; // Type check
                  gsap.from(card, {
-                    scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none none" },
+                    scrollTrigger: { trigger: card, start: "top 85%", toggleActions: "play none none none", once: true }, // Added once
                     scale: 0.8,
                     opacity: 0,
                     duration: 0.5,
@@ -1325,8 +1391,9 @@
 
             // Staggered fade-up for merch items
             gsap.utils.toArray('.merch-item').forEach((item, index) => {
+                if (!(item instanceof HTMLElement)) return; // Type check
                 gsap.from(item, {
-                    scrollTrigger: { trigger: item, start: "top 85%", toggleActions: "play none none none" },
+                    scrollTrigger: { trigger: item, start: "top 85%", toggleActions: "play none none none", once: true }, // Added once
                     y: 60,
                     opacity: 0,
                     duration: 0.7,
@@ -1336,28 +1403,36 @@
             });
 
              // Fade-up for combat planner form container
-             gsap.from('#planner .relative.bg-\\[color\\:var\\(--dark\\)\\]', {
-                 scrollTrigger: { trigger: '#planner', start: "top 70%", toggleActions: "play none none none" },
-                 y: 50,
-                 opacity: 0,
-                 duration: 1,
-                 ease: "power3.out"
-             });
+             const plannerFormContainer = document.querySelector('#planner .relative.bg-\\[color\\:var\\(--dark\\)\\]');
+              if (plannerFormContainer instanceof HTMLElement) { // Type check
+                  gsap.from(plannerFormContainer, {
+                     scrollTrigger: { trigger: plannerFormContainer, start: "top 70%", toggleActions: "play none none none", once: true }, // Added once
+                     y: 50,
+                     opacity: 0,
+                     duration: 1,
+                     ease: "power3.out"
+                  });
+              }
          }
 
          // Set current year in footer
          const currentYearElement = document.getElementById('current-year');
-         if (currentYearElement) {
-            currentYearElement.textContent = new Date().getFullYear();
+         if (currentYearElement instanceof HTMLElement) { // Type check
+            currentYearElement.textContent = String(new Date().getFullYear()); // Ensure string
          }
 
         // --- Initialize Functions ---
-        createParticles();
-        animateStats();
-        setupMerchModal();
-        setupCombatForm();
-        setupRippleEffects();
-        initGsapAnimations();
+        try {
+            createParticles();
+            animateStats();
+            setupMerchModal();
+            setupCombatForm();
+            setupRippleEffects();
+            initGsapAnimations();
+        } catch (error) {
+             console.error("Error during initialization:", error);
+        }
+
 
     }); // End DOMContentLoaded
 </script>
